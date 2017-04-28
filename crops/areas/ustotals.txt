@@ -1,0 +1,9 @@
+http://quickstats.nass.usda.gov/?source_desc=CENSUS
+
+Soy: 63915821
+Wheat: 50932969
+
+Value column: 18
+State FIPS column: 6
+County FIPS column: 10
+Unavailable Code: (D)
