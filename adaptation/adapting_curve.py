@@ -24,7 +24,7 @@ import csv
 import numpy as np
 from scipy.stats import linregress
 
-from iam import effect_bundle, weather
+from ..iam import effect_bundle, weather
 from openest.models.curve import CurveCurve, AdaptableCurve, StepCurve
 
 class SimpleAdaptingCurve(AdaptableCurve):
