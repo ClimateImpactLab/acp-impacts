@@ -23,8 +23,8 @@ The core class StateRun provides no mechanisms for modifying defaults.
 
 #### Other options ####
 
+* **readdir** - Mortality impact data directory
 * **deflator** - Deflator (currently 2012 to 2011: 0.982324529) may be changed in the `DEFLATOR_2012_TO_2011` parameter in lib/config.py
-* **readdir** - Mortality impact data directory - may be changed in the `DEFAULT_MORT_DIR` parameter in by\_state/calc.py
 * **discrate** - Set of discount rates used in mortality cost projections - may be changed in the `discount_rates` parameter in lib/config.py
 * **valuedir** - Output directory for absolute costs/benefits - may be changed in by_state/writer.py
 * **percapdir** - Output directory for per capita costs/benefits - may be changed in by\_state/writer.py
@@ -34,7 +34,7 @@ The core class StateRun provides no mechanisms for modifying defaults.
 
 #### ClassMethod CountyRun.run_scenario() options ####
 
-* **readdir** - Mortality impact data directory - optional override of `DEFAULT_MORT_DIR` parameter in by\_county/calc.py
+* **readdir** - Mortality impact data directory
 * **agglev** - Aggregation scheme for moving from counties to super-county groups. Options are 'county','state','nca','midwest','california'
 * **deflator** - Override the default deflator (currently 2012 to 2011: 0.982324529)
 * **test\_data** - Testing flag - True allows extrapolating state-level data to county level data in place of IMPLAN values
