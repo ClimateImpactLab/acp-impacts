@@ -27,3 +27,5 @@ as follows:
 
  - `agriculture`: Logic for describing agricultural response functions.
 
+ - `rhg-muse`: Computable general equilibrium model used in estimating
+   macroeconomic effects.
