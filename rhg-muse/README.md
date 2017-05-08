@@ -10,8 +10,8 @@ Special thanks to [Thomas Rutherford][], [Karen Fisher-Vanden][], [Miles Light][
 [Joseph Delgado][] provided invaluable technical assistance.
 
 
-[Shashank Mohan]: http://rhg.com/people/smohan
-[Shashank Mohan]: http://rhg.com/people/smohan
+[Shashank Mohan]: http://rhg.com/people/shashank-mohan
+[Michael Delgado]: http://rhg.com/people/michael-delgado
 [Rhodium Group]: http://rhg.com/
 
 [Thomas Rutherford]: https://www.aae.wisc.edu/faculty/tfrutherford
