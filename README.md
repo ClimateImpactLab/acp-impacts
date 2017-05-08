@@ -27,3 +27,5 @@ as follows:
 
  - `agriculture`: Logic for describing agricultural response functions.
 
+ - `market-mortality`: Module for computing market mortality impacts.
+
