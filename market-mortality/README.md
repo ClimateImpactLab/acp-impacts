@@ -24,7 +24,7 @@ The core class StateRun provides no mechanisms for modifying defaults.
 #### Other options ####
 
 * **readdir** - Mortality impact data directory
-* **deflator** - Deflator (currently 2012 to 2011: 0.982324529) may be changed in the `DEFLATOR_2012_TO_2011` parameter in lib/config.py
+* **deflator** - Deflator (currently 2012 to 2011: `0.982324529`) may be changed in the `DEFLATOR_2012_TO_2011` parameter in lib/config.py
 * **discrate** - Set of discount rates used in mortality cost projections - may be changed in the `discount_rates` parameter in lib/config.py
 * **valuedir** - Output directory for absolute costs/benefits - may be changed in by_state/writer.py
 * **percapdir** - Output directory for per capita costs/benefits - may be changed in by\_state/writer.py
