@@ -1,0 +1,170 @@
+$title US Climate Risk Assessment Static MPSGE Model File
+
+$ONTEXT
+  
+  Risky Business Static MPSGE Model File
+  
+  FILE:         muse_core.mpsge
+  LANGUAGE:     MPSGE
+  CALLED BY:    modelControl.gms
+  
+  PURPOSE:      
+
+
+$OFFTEXT
+
+
+$ontext
+
+$model:muse_core
+
+$sectors:
+  C(r)$s_DomR("c",r)              ! Total consumption
+  Y(r,s)$s_DomRS("y",r,s)         ! Production index
+  YX(r,s)$s_DomRS("yx",r,s)       ! Production using fixed capital
+  a(r,g)$s_DomRS("a",r,g)         ! Armington demand
+  gov(r)$s_DomR("gov",r)          ! Government Consumption
+  K                               ! Extant capital exchange
+
+$commodities:
+  PC(r)$c_DomR("pc",r)            ! Consumption good price
+  PA(r,s)$c_DomRS("pa",r,s)       ! Armington aggregate price
+  PN(s)$c_DomS("pn",s)            ! Intra-national trade price
+  PFX                             ! Foreign exchange
+  PGOV(r)$c_DomR("pgov",r)        ! government consumption
+  PL(r)$c_DomR("pl",r)            ! Wage rate
+  PY(r,s)$c_DomRS("py",r,s)       ! Output price
+  RK(r)$c_DomR("rk",r)            ! Return to new vintage capital
+  RKX(r,s)$c_DomRS("rkx",r,s)     ! Return to fixed capital
+  REXCH                           ! Weighted return to extant capital
+  PSAV                            ! price of national savings
+
+$consumers:
+  RA(r)                           ! Representative agent
+
+$auxiliary:
+  I_R(r)                          ! Regional investment
+  RKHAT                           ! Realized rate of return
+  INVADJ(r)                       ! Adjust the investment to fix the RA endowment to savings
+  THETAS(r)                       ! share of regional savings
+
+* Cobb-Douglas preferences across sectors:
+
+$prod:C(r)    s:1   ne:1
+  o:PC(r)                             q:DemTotReg0(r)
+  i:PA(r,s)$(not(sameas(s,"ENR")))    q:(DemGdsReg0(r,s))                          ne:
+  i:PA(r,"ENR")                       q:(DemGdsReg0(r,"ENR")*(1+enrdam(r,"ENR")))  p:(1/(1+enrdam(r,"ENR")))
+
+$prod:YX(r,s)$s_DomRS("yx",r,s) s:0  t:out_elas(r,s)  trd:(2*out_elas(r,s)) int:0 ne(int):0
+  o:PY(r,s)                           q:(DomOutTot0(r,s)*outdam(r,s))             p:(1/outdam(r,s))
+  o:PFX                               q:(IndIntExp0(r,s,"ftrd")*outdam(r,s))      p:(1/outdam(r,s))   trd:
+  o:PN(s)                             q:(IndIntExp0(r,s,"dtrd")*outdam(r,s))      p:(1/outdam(r,s))   trd:
+  i:PA(r,g)$(not(sameas(g,"ENR")))    q:(gdsUse(r,g,s)*(1+encdam(r,g,s)))                             ne:
+  i:PA(r,"ENR")                       q:(gdsUse(r,"ENR",s)*(1+encdam(r,"ENR",s)))                     int:
+  i:RKX(r,s)                          q:kx_refUse(r,s)       
+  i:PL(r)                             q:((lx_refUse(r,s)/gammaL(r,s))/labHeatImpct(r,s))
+
+$prod:Y(r,s)$s_DomRS("y",r,s)  s:0   kl:1  t:out_elas(r,s)  trd:(2*out_elas(r,s)) int:0 ne(int):0
+  o:PY(r,s)                           q:(DomOutTot0(r,s)*outdam(r,s))             p:(1/outdam(r,s))   
+  o:PFX                               q:(IndIntExp0(r,s,"ftrd")*outdam(r,s))      p:(1/outdam(r,s))   trd:
+  o:PN(s)                             q:(IndIntExp0(r,s,"dtrd")*outdam(r,s))      p:(1/outdam(r,s))   trd:
+  i:PA(r,g)$(not(sameas(g,"ENR")))    q:(gdsUse(r,g,s)*(1+encdam(r,g,s)))                             ne:
+  i:PA(r,"ENR")                       q:(gdsUse(r,"ENR",s)*(1+encdam(r,"ENR",s)))                     int:
+  i:RK(r)                             q:capUse(r,s)                                                   kl:
+  i:PL(r)        q:((labUse(r,s)/gammaL(r,s))/labHeatImpct(r,s))    p:(gammaL(r,s)*labHeatImpct(r,s)) kl:
+
+$report:
+  v:LN_Use(r,s)   i:PL(r)     prod:Y(r,s)
+  v:LX_Use(r,s)   i:PL(r)     prod:YX(r,s)
+  v:KN_Use(r,s)   i:RK(r)     prod:Y(r,s)
+  v:KX_Use(r,s)   i:RKX(r,s)  prod:YX(r,s)
+
+$prod:A(r,g)$s_DomRS("a",r,g)  s:arm_elas(r,g)    m:(2*arm_elas(r,g))
+  o:PA(r,g)       q:ArmAggGds0(r,g)
+  i:PFX           q:ImpGdsTot0(r,g,"ftrd")        m:
+  i:PY(r,g)       q:DomOutTot0(r,g)
+  i:PN(g)         q:ImpGdsTot0(r,g,"dtrd")        m:
+
+$prod:K
+  o:RKX(r,s)      q:(kx(r,s)/kxt)
+  i:REXCH         q:1
+
+$prod:gov(r)
+  o:PGOV(r)       q:(sum((s,pub),PubDemSec0(r,s,pub)))
+  i:PA(r,s)       q:(sum(pub,PubDemSec0(r,s,pub)))
+
+
+$constraint:I_R(r)
+* realized national rates of return on new capital reflect changes in the price of investment goods as well as capital rents
+  RKHAT*(sum(s,PA(r,s)*thetaRSAV(r,s))) =e= RK(r); 
+
+
+$constraint:RKHAT
+* The savings price is equal to the average investment goods price weighted by current regional investment and 2011 regional investment goods spending
+  sum(r, sum(s,PA(r,s)*thetaRSAV(r,s))*I_R(r)) =e= PSAV*sum(r,I_R(r));
+
+$constraint:THETAS(r)
+* Accounting variable assignment: THETAS equals the share of national savings in each region
+* read: thetas(r) = (mpsave(r)*RA(r))/(sum(rr,mpsave(rr,RA(rr))))
+  THETAS(r)*sum(rr,mpsave(rr)*RA(rr)) =e= mpsave(r)*RA(r);
+
+$constraint:INVADJ(r)
+* Bookkeeping: An adjustment is made to RA endowments to balance the regional GDP effect of having national savings and capital prices but local differences in prices at point of sale or use
+* INVADJ(r)*PSAV = r0 * [(r share of national savings) * (national new capital endowments) - (r new capital endowments)] + investment*[disparity between local investment price and national savings price]
+  INVADJ(r)*PSAV =e= r0 * (THETAS(r)*sum(rr,RK(rr)*I_R(rr))-RK(r)*I_R(r)) + I_R(r)*(sum(s,PA(r,s)*thetaRSAV(r,s))-PSAV);
+
+$demand:RA(r)   s:1.0
+  d:PC(r)         q:DemTotReg0(r)
+  d:PSAV          q:(sum(s,InvDemCom0(r,s)))
+  d:PGOV(r)       q:(sum((s,pub),PubDemSec0(r,s,pub)))
+  e:PFX           q:(TradeImbal0(r))
+  e:PSAV          q:1                   r:I_R(r)
+  e:PA(r,s)       q:(-thetaRSAV(r,s))   r:I_R(r)
+  e:RK(r)         q:r0                  r:I_R(r)
+  e:PSAV          q:1                   r:INVADJ(r)
+  e:REXCH         q:kexch(r)
+  e:PL(r)         q:labor(r)
+
+$report:
+  v:raInvest(r)   d:PSAV        demand:RA(r)
+  v:raConsum(r)   d:PC(r)       demand:RA(r)
+  v:raGdCns(r,g)  i:PA(r,g)     prod:C(r)
+  v:raGov(r)      d:PGOV(r)     demand:RA(r)
+  v:aPFX(r,s)     i:PFX         prod:A(r,s)
+  v:aPN(r,s)      i:PN(s)       prod:A(r,s)
+  v:yPFX(r,s)     o:PFX         prod:y(r,s)
+  v:yxPFX(r,s)    o:PFX         prod:yx(r,s)
+  v:yPN(r,s)      o:PN(s)       prod:y(r,s)
+  v:yxPN(r,s)     o:PN(s)       prod:yx(r,s)
+  v:pyY(r,s)      o:PY(r,s)     prod:Y(r,s)
+  v:pyYX(r,s)     o:PY(r,s)     prod:YX(r,s)
+  v:pnY(r,s)      o:PN(s)       prod:Y(r,s)
+  v:pnYX(r,s)     o:PN(s)       prod:YX(r,s)
+  v:pfxY(r,s)     o:PFX         prod:Y(r,s)
+  v:pfxYX(r,s)    o:PFX         prod:YX(r,s)
+  v:paY(r,s,g)    i:PA(r,g)     prod:Y(r,s)
+  v:paYX(r,s,g)   i:PA(r,g)     prod:YX(r,s)
+  v:pyARM(r,s)    i:PY(r,s)     prod:A(r,s)
+  v:pfxARM(r,s)   i:PFX         prod:A(r,s)
+  v:pnARM(r,s)    i:PN(s)       prod:A(r,s)
+
+
+$offtext
+
+$sysinclude mpsgeset muse_core
+
+* Choose a numeraire:
+PFX.fx = 1;
+
+RKHAT.L = 1;
+THETAS.L(r) = (sum(s,InvDemCom0(r,s)))/(sum((rr,g),InvDemCom0(rr,g)));
+INVADJ.LO(r) = -INF;
+I_R.L(r) = sum(s,InvDemCom0(r,s));
+INVADJ.L(r) = 0;
+PSAV.L = 1;
+
+
+muse_core.ITERLIM=100000;
+$include muse_core.GEN
+solve muse_core using mcp;
+muse_core.IterLIM=1000000;
