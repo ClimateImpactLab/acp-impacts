@@ -36,7 +36,7 @@ The core class StateRun provides no mechanisms for modifying defaults.
 
 * **readdir** - Mortality impact data directory
 * **agglev** - Aggregation scheme for moving from counties to super-county groups. Options are 'county','state','nca','midwest','california'
-* **deflator** - Override the default deflator (currently 2012 to 2011: 0.982324529)
+* **deflator** - Override the default deflator (currently 2012 to 2011: `0.982324529`)
 * **test\_data** - Testing flag - True allows extrapolating state-level data to county level data in place of IMPLAN values
 
 #### Modifying the aggregation scheme ####
