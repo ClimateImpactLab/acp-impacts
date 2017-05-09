@@ -10,6 +10,9 @@ as follows:
 
  - `climate`: The CO2 concentration data.
 
+ - `coastal-impacts`: Module for producing coastal damage estimates from RMS
+   simulation results.
+
  - `controller`: The top-level controller for generating all results.
    This is extract from the DMAS system, and cannot currently be run
    without it.
@@ -26,4 +29,3 @@ as follows:
  - `iam`: The top-level framework for generating projection results.
 
  - `agriculture`: Logic for describing agricultural response functions.
-
