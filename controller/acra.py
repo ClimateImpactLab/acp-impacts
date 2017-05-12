@@ -30,7 +30,6 @@ from openest.models.curve import FlatCurve, StepCurve, CurveCurve
 from openest.models.spline_model import SplineModel
 from openest.models.bin_model import BinModel
 from openest.models.univariate_model import UnivariateModel
-import merging
 
 __all__ = ['ACRAController'] # Used by TG2
 
