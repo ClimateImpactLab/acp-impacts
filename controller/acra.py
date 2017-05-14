@@ -23,7 +23,7 @@ from ..census import census
 from ..crime import crime
 from ..mortality import mortality
 from ..adaptation.adapting_curve import AdaptingCurve, SimpleAdaptingCurve
-from ..iam import effect_bundle, counties, weather, fake_weather
+from ..iam import effect_bundle, counties, weather
 from ..regional import aggregations
 from openest.models.memoizable import MemoizedUnivariate
 from openest.models.curve import FlatCurve, StepCurve, CurveCurve
@@ -2174,64 +2174,6 @@ class ACRAController(object):
                     for ii in range(len(years)):
                         writer.writerow([years[ii]] + list(results[fips][ii,]))
 
-    def diagnostic_s2_response_byp(self):
-        psamples = [.1, .3, .5, .7, .9]
-        (yyyyddd, tas, byyear) = fake_weather.make_sampling_365years(2000, -10, 50, 40)
-        tas = np.array(tas) + 273.15
-        tasmin = tas - 2
-        tasmax = tas + 2
-        (yyyyddd, pr) = fake_weather.make_constant_365years(2000, 1.0, 40)
-
-        for cat in ['grain-east', 'grain-west', 'cotton', 'oilcrop-east', 'oilcrop-west', 'violent', 'property', 'mortality', 'high', 'low']:
-            print cat
-            results = [[] for ii in range(40)]
-
-            for pval in psamples:
-                print pval
-                co2scale = ACRAController.make_co2scale(0)
-
-                dailys = {'tas': tas, 'pr': pr, 'tasmin': tasmin, 'tasmax': tasmax}
-                if cat == 'grain-east' or cat == 'grain-west':
-                    make_generator = ACRAController.make_grains_generator([pval] * 15, co2scale)
-                elif cat == 'cotton':
-                    make_generator = ACRAController.make_cotton_generator([pval] * 15, co2scale)
-                elif cat == 'oilcrop-east' or cat == 'oilcrop-west':
-                    make_generator = ACRAController.make_oilcrop_generator([pval] * 15, co2scale)
-                elif cat == 'violent':
-                    make_generator = self.make_violent_crime_generator([pval] * 4)
-                elif cat == 'property':
-                    make_generator = self.make_property_crime_generator([pval] * 4)
-                elif cat == 'mortality':
-                    make_generator = self.make_health_mortality_generator(pval)
-                elif cat == 'high':
-                    make_generator = self.make_labor_high_generator([pval] * 2)
-                elif cat == 'low':
-                    make_generator = self.make_labor_low_generator([pval] * 2)
-
-                if cat in ['grain-east', 'cotton', 'oilcrop-east']:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys, 0, -90):
-                        results[year - 2000].append(value)
-                elif cat in ['grain-west', 'oilcrop-west']:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys, 0, -110):
-                        results[year - 2000].append(value)
-                elif cat == 'mortality' or cat == 'part-violent':
-                    for (year, value) in make_generator('17161', yyyyddd, dailys['tas']):
-                        results[year - 2000].append(value)
-                elif cat in ['high', 'low']:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys['tasmax']):
-                        results[year - 2000].append(value)
-                else:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys):
-                        results[year - 2000].append(value)
-
-            with open("diagnostic-s2-" + cat + "-temps.csv", 'wb') as csvfp:
-                writer = csv.writer(csvfp, quoting=csv.QUOTE_MINIMAL)
-                writer.writerow(['tas'] + psamples)
-
-                for ii in range(len(results)):
-                    if len(results[ii]) > 0:
-                        writer.writerow([byyear[ii]] + results[ii])
-
     def diagnostic_input_distribution(self):
         fips = '01049'
         var = 'tas'
@@ -2686,20 +2628,3 @@ class ACRAController(object):
                     above_avg.add(sum(tas[:,ii] > 35 + 273.15))
 
                 writer.writerow([scenario, model] + np.percentile(list(above_avg), [5, 50, 95]) + np.percentile(list(above_max), [5, 50, 95]))
-
-    def diagnostic_days_by_bin(self):
-        fips_only = '48215'
-        model_tasmax = remote.view_model('url', ACRAController.models['crime_property_tasmax_url'])
-
-        make_generator = fake.make_print_bymonthdaybins(model_tasmax)
-
-        (variables, scenario, model) = effect_bundle.get_variables('001', 'rcp85', 'ccsm4')
-
-        def iterate(name, fips, generator):
-            if fips != fips_only:
-                return
-
-            for values in generator:
-                print values
-
-        effect_bundle.call_with_generator(None, variables['tasmax'], 'tasmax', make_generator, iterate)
