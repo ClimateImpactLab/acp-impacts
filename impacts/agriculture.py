@@ -328,7 +328,7 @@ def make_modelscale_byyear(make_generator, id, pval, func=lambda x, y, year: x*y
     return generate
 
 def aggregate_tar_with_scale_file(name, scale_files, scale_factors, targetdir=None, get_region=None, collabel="fraction", return_it=False):
-    """Create a aggregated result file, averaging results according to the
+    """Create an aggregated result file, averaging results according to the
     given scalings.  Used to combine counties to states
 
     Args:

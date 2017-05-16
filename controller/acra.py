@@ -17,7 +17,7 @@ except:
     pass
 
 from openest.dmas import remote, server
-from ..impacts import agriculture, fake, daily
+from ..impacts import agriculture, daily
 from ..extract import results, acptable, weightstable, unweightedtable
 from ..census import census
 from ..crime import crime
