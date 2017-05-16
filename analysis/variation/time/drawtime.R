@@ -84,12 +84,3 @@ for (do.sector in unique(gtbl$sector)) {
         ggsave(paste0("overtime/", do.sector, '-', do.outcome, ".pdf"))
     }
 }
-
-library(reshape2)
-
-gtbl <- melt(tbl, id=c("name", "year", "scenario", "all_SD", "varsum"))
-
-ggplot(subset(gtbl, name == "health-mortage-45-64" & scenario == "rcp85"),
-       aes(x=year+10, y=value*value, fill=variable)) +
-  geom_area(position="fill") +
-  geom_area(aes(x=year+10, y=all_SD*all_SD / varsum, fill="yellow"))
