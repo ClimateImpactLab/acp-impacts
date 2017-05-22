@@ -34,6 +34,7 @@ evalpvals = list(np.linspace(.01, .99, 99))
 base_model = 'hadgem2-ao' # Choose a model to compare variance against
 base_realization = '001' # Choose a realization to compare variance against
 
+# Collect the results for a given Monte Carlo run into our data dictionary
 def collect_result(impact, batch, rcp, model, realization, targetdir, data):
     """Collect the results for a paricular target directory, and filter them into data."""
     print targetdir

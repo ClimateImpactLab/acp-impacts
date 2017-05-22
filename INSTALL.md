@@ -1,3 +1,5 @@
+# Installation requirements
+
 To generate new results from climate data, you need to do the following:
 
 1. Install the requirements:
@@ -8,3 +10,6 @@ To generate new results from climate data, you need to do the following:
  - Download https://drive.google.com/open?id=0BwjYswM_266EYjRFTFRpZWNFOGs into `crops/data`.
 
 To generate figures, you need to install Stata and R.
+
+# Reproducing climate impact results
+
