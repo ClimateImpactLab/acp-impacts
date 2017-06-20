@@ -10,6 +10,9 @@ as follows:
 
  - `climate`: The CO2 concentration data.
 
+ - `coastal-impacts`: Module for producing coastal damage estimates from RMS
+   simulation results.
+
  - `controller`: The top-level controller for generating all results.
    This is extract from the DMAS system, and cannot currently be run
    without it.
@@ -29,3 +32,13 @@ as follows:
 
  - `rhg-muse`: Computable general equilibrium model used in estimating
    macroeconomic effects.
+
+ - `market-mortality`: Module for computing market mortality impacts.
+
+ - `analysis`: Scripts to analyze the results and produce plots.
+
+To generate results, you will also need to install
+https://github.com/ClimateImpactLab/open-estimate.
+
+To extract information from the results, use the tools at
+https://github.com/jrising/prospectus-tools/tree/master/acra/extract.
