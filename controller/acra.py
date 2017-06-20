@@ -17,20 +17,19 @@ except:
     pass
 
 from openest.dmas import remote, server
-from ..impacts import agriculture, fake, daily
+from ..impacts import agriculture, daily
 from ..extract import results, acptable, weightstable, unweightedtable
 from ..census import census
 from ..crime import crime
 from ..mortality import mortality
 from ..adaptation.adapting_curve import AdaptingCurve, SimpleAdaptingCurve
-from ..iam import effect_bundle, counties, weather, fake_weather
+from ..iam import effect_bundle, counties, weather
 from ..regional import aggregations
 from openest.models.memoizable import MemoizedUnivariate
 from openest.models.curve import FlatCurve, StepCurve, CurveCurve
 from openest.models.spline_model import SplineModel
 from openest.models.bin_model import BinModel
 from openest.models.univariate_model import UnivariateModel
-import merging
 
 __all__ = ['ACRAController'] # Used by TG2
 
@@ -41,6 +40,9 @@ checked_file_cge = 'cgechk-20140609' # Don't need crime or energy checked for CG
 # Convert from Fahrenheit to celsius
 def f2c(f):
     return (f - 32) / 1.8
+
+# Path to this directory, for accessing relative file data
+scriptdirpath = os.path.dirname(os.path.realpath(__file__))
 
 # These should be called from a paster request on the server (web will timeout)
 class ACRAController(object):
@@ -226,8 +228,8 @@ class ACRAController(object):
     def regional_aggregation(self):
         """Aggregate counties according to midwest metropolitan regions."""
 
-        #regions = aggregations.load_region_definitions(aggregator.__path__[0] + "/lib/acra/regional/midwest_regions.csv", 0, 1) # Midwest
-        regions = aggregations.load_region_definitions(aggregator.__path__[0] + "/lib/acra/regional/california_regions.csv", 0, 2) # California
+        #regions = aggregations.load_region_definitions(scriptdirpath + "../regional/midwest_regions.csv", 0, 1) # Midwest
+        regions = aggregations.load_region_definitions(scriptdirpath + "../regional/california_regions.csv", 0, 2) # California
         get_region = lambda fips: regions.get(fips, None) # Construct a aggregation function to pass to aggregate_tar()
 
         working = os.getcwd()
@@ -295,61 +297,6 @@ class ACRAController(object):
                         except:
                             os.chdir(working) # return to previous directory (would happen automatically if completed)
                             print "ERROR"
-
-    def fix_truehist_years(self):
-        """In first attempt to generate historical results, years were misnumbered.  Renumber them."""
-
-        # Iterate through all result directories
-        for (batch, rcp, model, realization, pvals, targetdir) in results.iterate_byp('/home/jrising/impacts2', 'truehist'): #results.iterate_montecarlo("/home/jrising/impacts2", "truehist"):
-            for filename in os.listdir(targetdir):
-                # Only operate on result bundles
-                if filename[-6:] != 'tar.gz':
-                    continue
-
-                # Check if this result tar needs to be fixed
-                with tarfile.open(os.path.join(targetdir, filename)) as tar:
-                    year = None # Extract the year from the second line
-
-                    # Find a file with data
-                    for subfile in tar.getnames()[1:]:
-                        fp = tar.extractfile(subfile)
-
-                        reader = csv.reader(fp)
-                        header = reader.next()
-                        try:
-                            year = int(reader.next()[0])
-                        except:
-                            pass
-                        fp.close()
-
-                        if year is not None:
-                            break
-
-                    if year != 1981 and year != 1982:
-                        print filename, "OKAY"
-                        continue # Already done-- skip it!
-
-                # Get the impact name
-                name = filename[0:-7]
-
-                # Given results from a generator
-                def fix_year(generator):
-                    first = generator.next()
-                    yeardiff = 0
-                    if first[0] == 1981 or first[0] == 1982:
-                        yeardiff = 20
-
-                    yield [first[0] - yeardiff] + first[2:]
-
-                    for yearresult in generator:
-                        yield [yearresult[0] - yeardiff] + yearresult[2:]
-
-                print targetdir, name
-                effect_bundle.make_tar_duplicate(name, os.path.join(targetdir, filename),
-                                             effect_bundle.make_instabase(
-                        effect_bundle.make(fix_year,
-                                           effect_bundle.load_tar_make_generator(targetdir, name)), 2012),
-                                                 targetdir=targetdir, collabel=header[1:])
 
     ### Result Generation Request Functions
 
@@ -1112,7 +1059,7 @@ class ACRAController(object):
 
         # Extract all CO2 levels by year
         co2conc = {}
-        with open(aggregator.__path__[0] + "/lib/acra/climate/co2conc.csv") as fp:
+        with open(scriptdirpath + "../climate/co2conc.csv") as fp:
             reader = csv.reader(fp, delimiter=',')
             reader.next()
             for row in reader:
@@ -1432,7 +1379,7 @@ class ACRAController(object):
         # Load low- and high-risk productivity effects
         # Construct a weighted average of these effects (based on # jobs)
         # Report results relative to 2012
-        effect_bundle.make_tar_dummy('labor-total-productivity', aggregator.__path__[0] + "/lib/acra",
+        effect_bundle.make_tar_dummy('labor-total-productivity', scriptdirpath + "..",
                                     effect_bundle.make_instabase(effect_bundle.make_weighted_average([
                         effect_bundle.load_tar_make_generator(targetdir, 'labor-low-productivity'),
                         effect_bundle.load_tar_make_generator(targetdir, 'labor-high-productivity')], [
@@ -1469,7 +1416,7 @@ class ACRAController(object):
         """
 
         # Open up the labor jobs data
-        with open(aggregator.__path__[0] + "/lib/acra/labor/lab_cty_00_05_sum.csv") as countyfp:
+        with open(scriptdirpath + "../labor/lab_cty_00_05_sum.csv") as countyfp:
             reader = csv.reader(countyfp, delimiter=',')
             reader.next() # skip header
 
@@ -1653,7 +1600,7 @@ class ACRAController(object):
     def load_acra_regions():
         regions = {}
 
-        with open(aggregator.__path__[0] + "/lib/acra/regions/regionsANSI.csv") as countyfp:
+        with open(scriptdirpath + "../regions/regionsANSI.csv") as countyfp:
             reader = csv.reader(countyfp, delimiter=',')
             reader.next() # skip header
 
@@ -1775,20 +1722,20 @@ class ACRAController(object):
             rcps = ['rcp26', 'rcp45', 'rcp60', 'rcp85']
             do_noco2 = False
 
-        root = "/home/jrising/aggregator/trunk/acra/extract/bycounty"
+        root = scriptdirpath + "../extract/bycounty"
         get_region = None
 
-        #root = "/home/jrising/aggregator/trunk/acra/extract/bystate"
+        #root = scriptdirpath + "../extract/bystate"
         #get_region = lambda fips: fips[0:2]
 
-        #root = "/home/jrising/aggregator/trunk/acra/extract/bynational"
+        #root = scriptdirpath + "../extract/bynational"
         #get_region = lambda fips: 'national'
 
-        #root = "/home/jrising/aggregator/trunk/acra/extract/byregion"
+        #root = scriptdirpath + "../extract/byregion"
         #regions = ACRAController.load_acra_regions()
         #get_region = lambda fips: regions.get(fips, None)
 
-        #root = "/home/jrising/aggregator/trunk/acra/extract/bynca"
+        #root = scriptdirpath + "../extract/bynca"
         #regions = ACRAController.load_acra_regions()
         #get_region = lambda fips: regions.get(fips, None)
         #default_func = lambda x: x
@@ -1891,29 +1838,8 @@ class ACRAController(object):
                                         else:
                                             writer1.writerow([fips] + list(1 + scaled / (scales1.get(fips, 0) + scales2.get(fips, 0) + scales3.get(fips, 0))))
 
-    def make_totalcalories(self):
-        # Collect the ACRA region definitions for regional aggregation
-        regions = ACRAController.load_acra_regions()
-        get_region = lambda fips: regions[fips] # passed to aggregate_tar
-
-        for (variables, scenario, model) in effect_bundle.find_ncdfs_onereal():
-            if scenario != 'rcp26' or model != 'fgoals-g2':
-                continue
-
-            targetdir = "/home/jrising/diagnostics/formike"
-            #os.mkdir(targetdir)
-
-            co2scale = ACRAController.make_co2scale(0)
-            pvals = [.5] * 15
-
-            effect_bundle.make_tar_ncdf('yields-grains', variables, ['tas', 'tasmin', 'tasmax', 'pr'],
-                                        ACRAController.make_grains_generator(pvals, co2scale, dont_divide=True), targetdir, collabel=['calories'])
-            agriculture.aggregate_tar_with_scale_file('yields-grains', ['maize-planted','wheat-planted'], [1690.,1615.], targetdir, True)
-            agriculture.aggregate_tar_with_scale_file('yields-grains', ['maize-planted','wheat-planted'], [1690.,1615.], targetdir, get_region)
-            agriculture.aggregate_tar_with_scale_file('yields-grains', ['maize-planted','wheat-planted'], [1690.,1615.], targetdir)
-
     def make_ncaregions(self):
-        root = "/home/jrising/aggregator/trunk/acra/extract/bynca"
+        root = scriptdirpath + "../extract/bynca"
         ncas = {'Great Plains': ['GPL', 'TXC'], 'Northeast': ['NEA', 'NAC'], 'Southeast': ['SEA', 'SAC', 'GLF'], 'Northwest': ['NWE', 'NPC'], 'Southwest': ['SWE', 'SPC'], 'Hawaii': ['HWI'], 'Midwest': ['MWE'], 'Alaska': ['ALK']}
 
         for filename in os.listdir(root):
@@ -1992,7 +1918,7 @@ class ACRAController(object):
 
     def write_scales(self):
         get_region = None
-        root = "/home/jrising/aggregator/trunk/acra/extract/bycounty"
+        root = scriptdirpath + "../extract/bycounty"
 
         # Just print out scales
         def make_callback(impact):
@@ -2174,64 +2100,6 @@ class ACRAController(object):
 
                     for ii in range(len(years)):
                         writer.writerow([years[ii]] + list(results[fips][ii,]))
-
-    def diagnostic_s2_response_byp(self):
-        psamples = [.1, .3, .5, .7, .9]
-        (yyyyddd, tas, byyear) = fake_weather.make_sampling_365years(2000, -10, 50, 40)
-        tas = np.array(tas) + 273.15
-        tasmin = tas - 2
-        tasmax = tas + 2
-        (yyyyddd, pr) = fake_weather.make_constant_365years(2000, 1.0, 40)
-
-        for cat in ['grain-east', 'grain-west', 'cotton', 'oilcrop-east', 'oilcrop-west', 'violent', 'property', 'mortality', 'high', 'low']:
-            print cat
-            results = [[] for ii in range(40)]
-
-            for pval in psamples:
-                print pval
-                co2scale = ACRAController.make_co2scale(0)
-
-                dailys = {'tas': tas, 'pr': pr, 'tasmin': tasmin, 'tasmax': tasmax}
-                if cat == 'grain-east' or cat == 'grain-west':
-                    make_generator = ACRAController.make_grains_generator([pval] * 15, co2scale)
-                elif cat == 'cotton':
-                    make_generator = ACRAController.make_cotton_generator([pval] * 15, co2scale)
-                elif cat == 'oilcrop-east' or cat == 'oilcrop-west':
-                    make_generator = ACRAController.make_oilcrop_generator([pval] * 15, co2scale)
-                elif cat == 'violent':
-                    make_generator = self.make_violent_crime_generator([pval] * 4)
-                elif cat == 'property':
-                    make_generator = self.make_property_crime_generator([pval] * 4)
-                elif cat == 'mortality':
-                    make_generator = self.make_health_mortality_generator(pval)
-                elif cat == 'high':
-                    make_generator = self.make_labor_high_generator([pval] * 2)
-                elif cat == 'low':
-                    make_generator = self.make_labor_low_generator([pval] * 2)
-
-                if cat in ['grain-east', 'cotton', 'oilcrop-east']:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys, 0, -90):
-                        results[year - 2000].append(value)
-                elif cat in ['grain-west', 'oilcrop-west']:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys, 0, -110):
-                        results[year - 2000].append(value)
-                elif cat == 'mortality' or cat == 'part-violent':
-                    for (year, value) in make_generator('17161', yyyyddd, dailys['tas']):
-                        results[year - 2000].append(value)
-                elif cat in ['high', 'low']:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys['tasmax']):
-                        results[year - 2000].append(value)
-                else:
-                    for (year, value) in make_generator('17161', yyyyddd, dailys):
-                        results[year - 2000].append(value)
-
-            with open("diagnostic-s2-" + cat + "-temps.csv", 'wb') as csvfp:
-                writer = csv.writer(csvfp, quoting=csv.QUOTE_MINIMAL)
-                writer.writerow(['tas'] + psamples)
-
-                for ii in range(len(results)):
-                    if len(results[ii]) > 0:
-                        writer.writerow([byyear[ii]] + results[ii])
 
     def diagnostic_input_distribution(self):
         fips = '01049'
@@ -2687,20 +2555,3 @@ class ACRAController(object):
                     above_avg.add(sum(tas[:,ii] > 35 + 273.15))
 
                 writer.writerow([scenario, model] + np.percentile(list(above_avg), [5, 50, 95]) + np.percentile(list(above_max), [5, 50, 95]))
-
-    def diagnostic_days_by_bin(self):
-        fips_only = '48215'
-        model_tasmax = remote.view_model('url', ACRAController.models['crime_property_tasmax_url'])
-
-        make_generator = fake.make_print_bymonthdaybins(model_tasmax)
-
-        (variables, scenario, model) = effect_bundle.get_variables('001', 'rcp85', 'ccsm4')
-
-        def iterate(name, fips, generator):
-            if fips != fips_only:
-                return
-
-            for values in generator:
-                print values
-
-        effect_bundle.call_with_generator(None, variables['tasmax'], 'tasmax', make_generator, iterate)

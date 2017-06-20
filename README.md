@@ -29,3 +29,11 @@ as follows:
  - `iam`: The top-level framework for generating projection results.
 
  - `agriculture`: Logic for describing agricultural response functions.
+
+ - `analysis`: Scripts to analyze the results and produce plots.
+
+To generate results, you will also need to install
+https://github.com/ClimateImpactLab/open-estimate.
+
+To extract information from the results, use the tools at
+https://github.com/jrising/prospectus-tools/tree/master/acra/extract.

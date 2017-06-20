@@ -1,0 +1,59 @@
+CLUSTER NAME,County,FIPS
+North Coast,Del Norte,6015
+North Coast,Siskiyou,6093
+North Coast,Humboldt,6023
+North Coast,Mendocino,6045
+North Coast,Lake,6033
+Sierra,Modoc,6049
+Sierra,Lassen,6035
+Sierra,Plumas,6063
+Sierra,Sierra ,6091
+Sierra,Nevada,6057
+Sierra,Amador,6005
+Sierra,Calveras,6009
+Sierra,Tuolumne,6109
+Sierra,Mariposa,6043
+Sierra,Alpine,6003
+Sierra,Mono,6051
+Central Valley,Shasta,6089
+Central Valley,Tehama,6103
+Central Valley,Glenn,6021
+Central Valley,Butte,6007
+Central Valley,Colusa,6011
+Central Valley,Sutter,6101
+Central Valley,Yuba,6115
+Central Valley,Yolo,6113
+Central Valley,Placer,6061
+Central Valley,El Dorado,6017
+Central Valley,Trinity,6105
+Central Valley,Sacramento,6067
+Central Coast,Sonoma,6097
+Central Coast,Napa,6055
+Central Coast,Marin,6041
+Central Coast,Solano,6095
+Central Coast,Contra Costa,6013
+Central Coast,Alameda,6001
+Central Coast,Santa Clara,6085
+Central Coast,San Mateo,6081
+Central Coast,San Francisco,6075
+Central Coast,Santa Cruz,6087
+Central Coast,San Benito,6069
+Central Coast,Monterey,6053
+San Joaquin Valley,San Joaquin,6077
+San Joaquin Valley,Staninlaus,6099
+San Joaquin Valley,Merced,6047
+San Joaquin Valley,Madera,6039
+San Joaquin Valley,Fresno,6019
+San Joaquin Valley,Kings,6031
+San Joaquin Valley,Tulare,6107
+San Joaquin Valley,Kern,6029
+Inland Empire + Imperial,San Bernardino,6071
+Inland Empire + Imperial,Riverside,6065
+Inland Empire + Imperial,Imperial,6025
+Inland Empire + Imperial,Inyo,6027
+South Coast,Orange,6059
+South Coast,San Diego,6073
+South Coast,San Luis Obispo,6079
+South Coast,Santa Barbara,6083
+South Coast,Ventura,6111
+South Coast,Los Angeles,6037
