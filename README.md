@@ -30,6 +30,9 @@ as follows:
 
  - `agriculture`: Logic for describing agricultural response functions.
 
+ - `rhg-muse`: Computable general equilibrium model used in estimating
+   macroeconomic effects.
+
  - `market-mortality`: Module for computing market mortality impacts.
 
  - `analysis`: Scripts to analyze the results and produce plots.
