@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Custom
+ALL_CROPS_ArcINFO_5min_unfilled.tar

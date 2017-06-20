@@ -1,0 +1,43 @@
+This directory contained employment data from the Bureau of Labor
+Statistics, over the years 2000 - 2005.
+
+1) lab_cty_00_05: each county appears roughly 4 times. The counties
+appear multiple times because of "ownership" of the sector. These are
+defined via the variable "own_code" as follows:
+
+1= Federal Government
+2= State Government
+3= Local Government
+4= Private
+
+2) lab_cty_00_05_sum: each county appears only once, with sums of
+total labor per sector regardless of ownership. The sum is taken over
+the within-county averages for ownership type, detailed above.
+
+Variable definitions:
+------------------------------------------------------------------------------------------------------------------
+              storage  display     value
+variable name   type   format      label      variable label
+------------------------------------------------------------------------------------------------------------------
+fips            str5   %9s
+own_code        byte   %8.0g
+av_11           float  %9.0g                  Agriculture, forestry, fishing and hunting
+av_21           float  %9.0g                  Mining, quarrying, and oil and gas extraction
+av_22           float  %9.0g                  Utilities
+av_23           float  %9.0g                  Construction
+av_31           float  %9.0g                  Manufacturing
+av_42           float  %9.0g                  Wholesale trade
+av_44           float  %9.0g                  Retail trade
+av_48           float  %9.0g                  Transportation and warehousing
+av_51           float  %9.0g                  Information
+av_52           float  %9.0g                  Finance and insurance
+av_53           float  %9.0g                  Real estate and rental and leasing
+av_54           float  %9.0g                  Professional and technical services
+av_55           float  %9.0g                  Management of companies and enterprises
+av_56           float  %9.0g                  Administrative and waste services
+av_61           float  %9.0g                  Educational services
+av_62           float  %9.0g                  Health care and social assistance
+av_71           float  %9.0g                  Arts, entertainment, and recreation
+av_72           float  %9.0g                  Accommodation and food services
+av_81           float  %9.0g                  Other services, except public administration
+av_92           float  %9.0g                  Public Administration
