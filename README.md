@@ -30,6 +30,8 @@ as follows:
 
  - `agriculture`: Logic for describing agricultural response functions.
 
+ - `market-mortality`: Module for computing market mortality impacts.
+
  - `analysis`: Scripts to analyze the results and produce plots.
 
 To generate results, you will also need to install
