@@ -1,5 +1,9 @@
 Data from http://quickstats.nass.usda.gov/
-Produced using output option on http://127.0.0.1:8080/maps/custom_map_upload
+
+Values recorded as an average over the period 2000 - 2005.
+
+Produced using output option on http://dmas.berkeley.edu/maps/custom_map_upload
 
 -prod2 files produced by acra/crops/prepare-data.R
-All in terms of MT
+
+Production in terms of MT; planted area in terms of acres.
